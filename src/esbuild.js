@@ -14,18 +14,25 @@ export const plugin_contents = () => ({
 			{
 				filter: new RegExp('^' + virtual_module_id_prefix)
 			},
-			async ({ path, resolveDir, importer }) => ({
-				path: await build.resolve(
-					path.slice(virtual_module_id_prefix.length),
+			async ({ path, resolveDir, importer }) => {
+				const resolve_path = path.slice(virtual_module_id_prefix.length)
+				const resolved = await build.resolve(
+					resolve_path,
 					{
 						kind: 'import-statement',
 						resolveDir
 					}
 				)
-					.then(x => x.path)
-				,
-				namespace
-			})
+
+				if (resolved.errors.length) {
+					return resolved
+				}
+
+				return {
+					path: resolved.path,
+					namespace
+				}
+			}
 		)
 
 		build.onLoad(

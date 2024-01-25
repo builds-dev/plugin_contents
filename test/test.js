@@ -31,4 +31,23 @@ test('', async () => {
 	assert.equal(foo_module.foo('x'), 'foo x')
 })
 
+test('', async () => {
+	try {
+		const bundle = await build({
+			bundle: true,
+			entryPoints: [ join_path(__dirname, 'fixtures', 'import_non_existant.js') ],
+			format: 'esm',
+			platform: 'node',
+			plugins: [
+				plugin_contents()
+			],
+			write: false
+		})
+		assert.unreachable('should have thrown')
+	} catch (error) {
+		assert.match(error.message, 'import_non_existant.js')
+		assert.match(error.message, 'Could not resolve "./really_non_existant.js"')
+	}
+})
+
 test.run()

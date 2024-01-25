@@ -26,11 +26,15 @@ export const plugin_contents = () => {
 			const module_info = this.getModuleInfo(id)
 			if (module_info.meta[meta]) {
 				const { importer, options } = module_info.meta[meta]
+				const resolve_id = id.slice(virtual_module_id_prefix.length)
 				const resolution = await this.resolve(
-					id.slice(virtual_module_id_prefix.length),
+					resolve_id,
 					importer,
 					options
 				)
+				if (!resolution) {
+					this.error(`Could not resolve ${resolve_id}`)
+				}
 				this.addWatchFile(resolution.id)
 				return { code: await create_contents_module(resolution.id) }
 			}
